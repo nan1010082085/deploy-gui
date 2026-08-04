@@ -55,7 +55,14 @@ app.prepare().then(() => {
       return;
     }
 
-    const credential = decrypt(row.credential);
+    let credential: string;
+    try {
+      credential = decrypt(row.credential);
+    } catch {
+      ws.send(JSON.stringify({ type: 'error', message: '凭据解密失败，请重新编辑服务器并输入密码/密钥' }));
+      ws.close();
+      return;
+    }
     const conn = new Client();
     const config: Record<string, unknown> = {
       host: row.host,
