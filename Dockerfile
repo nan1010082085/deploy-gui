@@ -6,6 +6,10 @@ WORKDIR /app
 # 安装 better-sqlite3 编译需要的工具
 RUN apk add --no-cache python3 make g++
 
+# 使用国内镜像加速
+RUN npm config set registry https://registry.npmmirror.com \
+    && npm config set node_headers_url https://npmmirror.com/mirrors/node
+
 # 安装依赖
 COPY package*.json ./
 RUN npm ci
@@ -21,8 +25,10 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# 安装 better-sqlite3 运行需要的工具 + tsx
 RUN apk add --no-cache python3 make g++
+
+RUN npm config set registry https://registry.npmmirror.com \
+    && npm config set node_headers_url https://npmmirror.com/mirrors/node
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -31,7 +37,7 @@ ENV PORT=3000
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# 安装生产依赖（需要重新编译 better-sqlite3）
+# 安装生产依赖
 RUN npm ci --omit=dev
 
 # 复制构建产物和 server
