@@ -1,3 +1,7 @@
+// 前端 API 封装，自动适配 basePath
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const apiBase = `${basePath}/api`;
+
 export interface ServerItem {
   id: number;
   name: string;
@@ -9,8 +13,6 @@ export interface ServerItem {
   created_at: string;
   updated_at: string;
 }
-
-const apiBase = '/api';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${apiBase}${url}`, {
@@ -41,3 +43,5 @@ export const api = {
     auth_type: 'password' | 'key'; credential: string;
   }) => request<{ success: boolean; message: string }>('/servers/test', { method: 'POST', body: JSON.stringify(data) }),
 };
+
+export { basePath };

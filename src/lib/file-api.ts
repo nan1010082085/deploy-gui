@@ -1,6 +1,4 @@
-'use client';
-
-import { api } from '@/lib/api';
+import { api } from './api';
 
 export interface FileItem {
   filename: string;
@@ -18,7 +16,8 @@ export interface FileListResult {
   items: FileItem[];
 }
 
-const base = '/api/files';
+import { basePath } from './api';
+const base = `${basePath}/api/files`;
 
 export const fileApi = {
   list: (serverId: number, path: string) =>

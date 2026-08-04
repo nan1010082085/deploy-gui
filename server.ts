@@ -25,7 +25,8 @@ app.prepare().then(() => {
 
   server.on('upgrade', (req, socket, head) => {
     const { pathname } = parse(req.url!, true);
-    if (pathname?.startsWith('/ws/terminal/')) {
+    // 支持 basePath: /deploy/ws/terminal/ 或 /ws/terminal/
+    if (pathname && /(?:^\/deploy)?\/ws\/terminal\//.test(pathname)) {
       wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit('connection', ws, req);
       });
@@ -39,8 +40,8 @@ app.prepare().then(() => {
     const { pathname } = parse(req.url!, true);
     if (!pathname) return;
 
-    // /ws/terminal/:serverId
-    const match = pathname.match(/^\/ws\/terminal\/(\d+)$/);
+    // /deploy/ws/terminal/:serverId 或 /ws/terminal/:serverId
+    const match = pathname.match(/(?:^\/deploy)?\/ws\/terminal\/(\d+)$/);
     if (!match) {
       ws.close();
       return;

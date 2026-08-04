@@ -45,7 +45,8 @@ export function createTerminal(
   fitAddon.fit();
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}/ws/terminal/${serverId}`;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const wsUrl = `${protocol}//${window.location.host}${basePath}/ws/terminal/${serverId}`;
   const ws = new WebSocket(wsUrl);
 
   let ready = false;

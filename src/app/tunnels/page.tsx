@@ -5,6 +5,8 @@ import { Card, Table, Button, Space, Tag, Modal, Form, Input, InputNumber, Selec
 import { PlusOutlined, ReloadOutlined, DeleteOutlined, EditOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import { api, type ServerItem } from '@/lib/api';
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 const { Title } = Typography;
 
 interface TunnelItem {
@@ -33,7 +35,7 @@ export default function TunnelsPage() {
     setLoading(true);
     try {
       const [tunnelRes, serverRes] = await Promise.all([
-        fetch('/api/tunnels').then(r => r.json()),
+        fetch(`${basePath}/api/tunnels`).then(r => r.json()),
         api.listServers(),
       ]);
       setTunnels(tunnelRes);
@@ -50,7 +52,7 @@ export default function TunnelsPage() {
   const handleStart = async (id: number) => {
     setTogglingId(id);
     try {
-      const res = await fetch(`/api/tunnels/${id}/start`, { method: 'POST' }).then(r => r.json());
+      const res = await fetch(`${basePath}/api/tunnels/${id}/start`, { method: 'POST' }).then(r => r.json());
       if (res.success) message.success('隧道已启动');
       else message.error(res.error || '启动失败');
       load();
@@ -64,7 +66,7 @@ export default function TunnelsPage() {
   const handleStop = async (id: number) => {
     setTogglingId(id);
     try {
-      await fetch(`/api/tunnels/${id}/stop`, { method: 'POST' });
+      await fetch(`${basePath}/api/tunnels/${id}/stop`, { method: 'POST' });
       message.success('隧道已停止');
       load();
     } catch (e) {
@@ -76,7 +78,7 @@ export default function TunnelsPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await fetch(`/api/tunnels/${id}`, { method: 'DELETE' });
+      await fetch(`${basePath}/api/tunnels/${id}`, { method: 'DELETE' });
       message.success('已删除');
       load();
     } catch (e) {
@@ -109,14 +111,14 @@ export default function TunnelsPage() {
       const values = await form.validateFields();
       const payload = { ...values, auto_start: values.auto_start ? 1 : 0 };
       if (editing) {
-        await fetch(`/api/tunnels/${editing.id}`, {
+        await fetch(`${basePath}/api/tunnels/${editing.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
         message.success('更新成功');
       } else {
-        await fetch('/api/tunnels', {
+        await fetch(`${basePath}/api/tunnels`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

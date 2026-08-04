@@ -6,6 +6,8 @@ import { RocketOutlined, SettingOutlined, ReloadOutlined, PlayCircleOutlined, Fi
 
 const { Title, Text, Paragraph } = Typography;
 
+const bp = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 interface JenkinsJob {
   name: string;
   color: string;
@@ -63,7 +65,7 @@ export default function DeployPage() {
 
   const loadConfig = async () => {
     try {
-      const res = await fetch('/api/jenkins/config').then(r => r.json());
+      const res = await fetch(`${bp}/api/jenkins/config`).then(r => r.json());
       setConfig(res);
       configForm.setFieldsValue({ url: res.url, user: res.user });
     } catch { /* */ }
@@ -73,7 +75,7 @@ export default function DeployPage() {
     if (!config?.configured && !config?.url) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/jenkins/jobs').then(r => r.json());
+      const res = await fetch(`${bp}/api/jenkins/jobs`).then(r => r.json());
       if (res.error) {
         message.error(res.error);
         setJobs([]);
@@ -101,7 +103,7 @@ export default function DeployPage() {
   const handleBuild = async (jobName: string) => {
     setBuildingJobs(prev => new Set(prev).add(jobName));
     try {
-      const res = await fetch(`/api/jenkins/jobs/${encodeURIComponent(jobName)}/build`, {
+      const res = await fetch(`${bp}/api/jenkins/jobs/${encodeURIComponent(jobName)}/build`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -123,7 +125,7 @@ export default function DeployPage() {
     setBuildsLoading(true);
     setBuildsModal({ jobName, builds: [] });
     try {
-      const builds = await fetch(`/api/jenkins/jobs/${encodeURIComponent(jobName)}/builds`).then(r => r.json());
+      const builds = await fetch(`${bp}/api/jenkins/jobs/${encodeURIComponent(jobName)}/builds`).then(r => r.json());
       if (builds.error) {
         message.error(builds.error);
         setBuildsModal(null);
@@ -142,7 +144,7 @@ export default function DeployPage() {
     setLogLoading(true);
     setLogModal({ jobName, buildNumber, log: '' });
     try {
-      const log = await fetch(`/api/jenkins/jobs/${encodeURIComponent(jobName)}/builds?log=${buildNumber}`).then(r => r.text());
+      const log = await fetch(`${bp}/api/jenkins/jobs/${encodeURIComponent(jobName)}/builds?log=${buildNumber}`).then(r => r.text());
       setLogModal({ jobName, buildNumber, log });
     } catch {
       message.error('获取日志失败');
@@ -155,7 +157,7 @@ export default function DeployPage() {
   const handleSaveConfig = async () => {
     try {
       const values = await configForm.validateFields();
-      await fetch('/api/jenkins/config', {
+      await fetch(`${bp}/api/jenkins/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
