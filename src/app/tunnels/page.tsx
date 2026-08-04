@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Switch, message, Popconfirm, Typography } from 'antd';
-import { PlusOutlined, ReloadOutlined, DeleteOutlined, EditOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
+import { Card, Table, Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Switch, message, Popconfirm, Typography, Tooltip, Alert } from 'antd';
+import { PlusOutlined, ReloadOutlined, DeleteOutlined, EditOutlined, PlayCircleOutlined, PauseCircleOutlined, CopyOutlined } from '@ant-design/icons';
 import { api, type ServerItem } from '@/lib/api';
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-const { Title } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 interface TunnelItem {
   id: number;
@@ -130,6 +130,20 @@ export default function TunnelsPage() {
     } catch { /* form validation */ }
   };
 
+  const handleCopyCommand = (tunnel: TunnelItem) => {
+    // 生成在用户本地电脑上执行的 SSH 命令
+    // 效果：本地端口 -> tunnel 服务器 -> 远程目标
+    const cmd = `ssh -L ${tunnel.local_port}:${tunnel.remote_host}:${tunnel.remote_port} -N root@${tunnel.server_host}`;
+    navigator.clipboard.writeText(cmd).then(() => {
+      message.success('命令已复制到剪贴板');
+    }).catch(() => {
+      Modal.info({
+        title: '本地 SSH 隧道命令',
+        content: <Input value={cmd} readOnly style={{ marginTop: 8 }} />,
+      });
+    });
+  };
+
   const columns = [
     { title: '名称', dataIndex: 'name', key: 'name', render: (t: string) => <strong>{t}</strong> },
     {
@@ -141,7 +155,7 @@ export default function TunnelsPage() {
       render: (_: unknown, r: TunnelItem) => (
         <span>
           <Tag color="blue">本地:{r.local_port}</Tag>
-          →
+          {' -> '}
           <Tag color="cyan">{r.remote_host}:{r.remote_port}</Tag>
         </span>
       ),
@@ -157,7 +171,7 @@ export default function TunnelsPage() {
         : <Tag color="default">○ 已停止</Tag>,
     },
     {
-      title: '操作', key: 'actions', width: 260,
+      title: '操作', key: 'actions', width: 360,
       render: (_: unknown, r: TunnelItem) => (
         <Space>
           {r.status === 'running' ? (
@@ -165,6 +179,9 @@ export default function TunnelsPage() {
           ) : (
             <Button size="small" type="primary" icon={<PlayCircleOutlined />} loading={togglingId === r.id} onClick={() => handleStart(r.id)}>启动</Button>
           )}
+          <Tooltip title="复制在本地电脑执行的 SSH 命令，实现本地端口转发">
+            <Button size="small" icon={<CopyOutlined />} onClick={() => handleCopyCommand(r)}>复制命令</Button>
+          </Tooltip>
           <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(r)}>编辑</Button>
           <Popconfirm title="确定删除？" onConfirm={() => handleDelete(r.id)}>
             <Button size="small" danger icon={<DeleteOutlined />}>删除</Button>
@@ -183,6 +200,24 @@ export default function TunnelsPage() {
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>添加隧道</Button>
         </Space>
       </div>
+
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="两种使用方式"
+        description={
+          <div>
+            <Paragraph style={{ margin: '4px 0' }}>
+              <Text strong>方式一（推荐）</Text>：点「复制命令」，在本地终端粘贴执行，端口直接开在你本地电脑上。
+            </Paragraph>
+            <Paragraph style={{ margin: '4px 0' }}>
+              <Text strong>方式二</Text>：点「启动」，端口开在本面板所在服务器上，需要通过服务器中转访问。
+            </Paragraph>
+          </div>
+        }
+      />
+
       <Table
         columns={columns}
         dataSource={tunnels}
@@ -220,7 +255,7 @@ export default function TunnelsPage() {
           <Form.Item name="remote_port" label="远程端口" rules={[{ required: true, message: '请输入远程端口' }]}>
             <InputNumber min={1} max={65535} style={{ width: '100%' }} placeholder="3306" />
           </Form.Item>
-          <Form.Item name="auto_start" label="自动启动" valuePropName="checked">
+          <Form.Item name="auto_start" label="自动启动（服务器端隧道）" valuePropName="checked">
             <Switch />
           </Form.Item>
         </Form>
