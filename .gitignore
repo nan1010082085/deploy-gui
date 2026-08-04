@@ -46,3 +46,10 @@ logs/
 
 # ===== Docker =====
 docker-compose.override.yml
+
+# ===== AI / 开发辅助文件（不提交） =====
+CLAUDE.md
+AGENTS.md
+PLAN.md
+SECURITY.md
+.claude/
