@@ -56,7 +56,11 @@ export function saveJenkinsConfig(url: string, user: string, token: string) {
 }
 
 export function getJenkinsConfigPublic() {
-  const { jenkinsUrl, jenkinsUser } = getJenkinsConfig();
+  const db = getDb();
+  const url = db.prepare('SELECT value FROM config WHERE key = ?').get('jenkins_url') as { value: string } | undefined;
+  const user = db.prepare('SELECT value FROM config WHERE key = ?').get('jenkins_user') as { value: string } | undefined;
+  const jenkinsUrl = url?.value || process.env.JENKINS_URL || '';
+  const jenkinsUser = user?.value || process.env.JENKINS_USER || '';
   return { url: jenkinsUrl, user: jenkinsUser, configured: !!jenkinsUrl };
 }
 
