@@ -29,6 +29,8 @@ node_modules/
 dist/
 build/
 web/dist/
+.next/
+out/
 
 # ===== IDE / 编辑器 =====
 .vscode/
