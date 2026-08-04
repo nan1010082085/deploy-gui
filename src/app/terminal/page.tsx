@@ -107,7 +107,7 @@ export default function TerminalPage() {
         <Empty description="选择服务器并打开终端" style={{ marginTop: 80 }} />
       ) : (
         <Tabs
-          type="editable"
+          type="editable-card"
           hideAdd
           activeKey={activeKey}
           onChange={setActiveKey}
