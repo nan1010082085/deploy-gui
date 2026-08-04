@@ -1,7 +1,10 @@
 # 阶段 1：构建前端
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
+
+# 安装 better-sqlite3 编译需要的工具
+RUN apk add --no-cache python3 make g++
 
 # 安装依赖
 COPY package*.json ./
@@ -14,11 +17,11 @@ COPY . .
 RUN npm run build
 
 # 阶段 2：运行
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# 安装 better-sqlite3 需要的原生依赖
+# 安装 better-sqlite3 运行需要的工具 + tsx
 RUN apk add --no-cache python3 make g++
 
 ENV NODE_ENV=production

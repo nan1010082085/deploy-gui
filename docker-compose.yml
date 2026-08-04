@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   deploy-gui:
     build: .
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/app/data        # SQLite 数据持久化
+      - ./data:/app/data
     environment:
       - ENCRYPT_KEY=${ENCRYPT_KEY}
       - NODE_ENV=production
