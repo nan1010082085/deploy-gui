@@ -1,0 +1,46 @@
+# ===== 敏感数据 - 绝对不提交 =====
+# SSH 密钥文件
+*.pem
+*.key
+*.ppk
+id_rsa*
+id_ed25519*
+*.p12
+*.pfx
+
+# 环境变量 / 密钥配置
+.env
+.env.*
+.env.local
+secrets.json
+config/local.json
+keys/
+
+# SQLite 数据文件（包含服务器密码、Jenkins token 等）
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# ===== 依赖 =====
+node_modules/
+
+# ===== 构建产物 =====
+dist/
+build/
+web/dist/
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ===== 日志 =====
+*.log
+logs/
+
+# ===== Docker =====
+docker-compose.override.yml
