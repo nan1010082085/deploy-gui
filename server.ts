@@ -5,6 +5,7 @@ import next from 'next';
 import { getDb, type ServerRow } from './src/lib/db';
 import { decrypt } from './src/lib/crypto';
 import { Client } from 'ssh2';
+import { autoStartTunnels, stopAllTunnels } from './src/lib/tunnel';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
@@ -115,5 +116,17 @@ app.prepare().then(() => {
 
   server.listen(port, () => {
     console.log(`> Deploy GUI on http://localhost:${port}`);
+    // 自动启动标记了 auto_start 的隧道
+    autoStartTunnels().catch(err => console.error('[tunnel] auto-start error:', err.message));
+  });
+
+  // 退出时清理隧道
+  process.on('SIGINT', () => {
+    stopAllTunnels();
+    process.exit(0);
+  });
+  process.on('SIGTERM', () => {
+    stopAllTunnels();
+    process.exit(0);
   });
 });
