@@ -23,10 +23,12 @@
 ## 2. 技术栈
 
 ```
-前端:  Vue 3 + Vite + Naive UI + xterm.js
-后端:  Node.js + Fastify + ssh2 + better-sqlite3 + ws
-数据库: SQLite (单文件，零运维)
-部署:  Docker / PM2
+框架:  Next.js 16 (App Router) + TypeScript
+UI:    Ant Design 5 + Tailwind CSS
+SSH:   ssh2 (终端/SFTP/隧道)
+数据库: SQLite (better-sqlite3，单文件，零运维)
+终端:  xterm.js + WebSocket (ws, custom server)
+部署:  Docker / Docker Compose
 ```
 
 ### 为什么选这套
